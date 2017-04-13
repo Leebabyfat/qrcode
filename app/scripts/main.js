@@ -48,7 +48,7 @@
 
     var client = new QRClient();
     //创建一个worker thread
-    var qrworker = new Worker("script/jsqrcode/qrworker.js");
+    var qrWorker = new Worker("jsqrcode/qrworker.js");
     var self = this;
 
     this.currentUrl = undefined;
@@ -56,8 +56,9 @@
     this.detectQRCode = function(imageData, callback) {
       callback = callback || function() {};
       //向web worker发送数据
-      qrworker.postMessage(imageData);
-      qrworker.onmessage = function(result) {
+      qrWorker.postMessage(imageData);
+
+      qrWorker.onmessage = function(result) {
         var url = result.data;
         if(url !== undefined) {
           self.currentUrl = url;
@@ -65,15 +66,14 @@
         callback(url);
       };
 
-      qrworker.onerror = function(error){
+      qrWorker.onerror = function(error){
         function WorkerException(message){
-          this.name = "WorkerException";
+          this.name = " WorkerException ";
           this.message = message;
         };
-        throw new WorkerException('Decoder error');
-        
+        throw new WorkerException("Decoder error");
+        callback(undefined);
       };
-      callback(undefined);
     };
 
     this.showDialog = function(url) {
